@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1702032045 source:c:\users\fanta\documents\github\snakegame\snake\main.cpp
+	<bits/stdc++.h>
+	"windows.h"
+	<conio.h>
+
