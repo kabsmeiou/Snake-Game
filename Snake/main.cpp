@@ -108,6 +108,14 @@ with the body.
 void mapObjects() {
     gameGrid = emptyCopy;
     std::pair<int, int> food = foodPlacement.front();
+    for (int r = 0; r < row; r++) {
+        for (int c = 0; c < col; c++) {
+            if (r == 0 || r == row - 1 || c == 0 || c == col - 1) {
+                gameGrid[r][c] = -1;
+            }
+        }
+    }
+
     int cur = 1;
     if (dizzyTimer > 0) {
         dizzyTimer--;
@@ -306,6 +314,33 @@ void generateBody() {
     }
 }
 
+bool bfs(char move) {
+    std::vector<bool> value(4, 0);
+    std::queue<std::pair<int, int>> cells;
+    std::pair<int, int> head = snakeBody.front();
+    cells.push({head.first + 1, head.second});
+    cells.push({head.first - 1, head.second});
+    cells.push({head.first, head.second + 1});
+    cells.push({head.first, head.second - 1});
+    size_t pos = 0;
+    while (!cells.empty()) {
+        std::pair<int, int> currentCell = cells.front();
+        cells.pop();
+        value[pos] = (gameGrid[currentCell.first][currentCell.second] == 0 || gameGrid[currentCell.first][currentCell.second] == 2 || gameGrid[currentCell.first][currentCell.second] == 7);
+        pos++;
+    }
+    if (move == D) {
+        return value[0];
+    } else if (move == U) {
+        return value[1];
+    } else if (move == R) {
+        return value[2];
+    } else if (move == L) {
+        return value[3];
+    }
+    return false;
+}
+
 /*
 //////////////////////////////////////
 handling the keyboard hits(input to
@@ -316,13 +351,13 @@ void handleInput() {
     if (_kbhit()) {
         while (true) {
             if (GetAsyncKeyState(VK_UP)) {
-                if (snakeMovement.empty() || snakeMovement.top() != D) snakeMovement.push(U);
+                if (snakeMovement.empty() || bfs(U)) snakeMovement.push(U);
             } else if (GetAsyncKeyState(VK_LEFT)) {
-                if (snakeMovement.empty() || snakeMovement.top() != R) snakeMovement.push(L);
+                if (snakeMovement.empty() || bfs(L)) snakeMovement.push(L);
             } else if (GetAsyncKeyState(VK_RIGHT)) {
-                if (snakeMovement.empty() || snakeMovement.top() != L) snakeMovement.push(R);
+                if (snakeMovement.empty() || bfs(R)) snakeMovement.push(R);
             } else if (GetAsyncKeyState(VK_DOWN)) {
-                if (snakeMovement.empty() || snakeMovement.top() != U) snakeMovement.push(D);
+                if (snakeMovement.empty() || bfs(D)) snakeMovement.push(D);
             }
             break;
         }
